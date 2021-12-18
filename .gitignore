@@ -1,0 +1,5 @@
+/data
+/script/__pycache__
+/script/model/__pycache__
+/script/model/res
+.DS_Store
