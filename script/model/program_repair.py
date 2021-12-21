@@ -11,15 +11,15 @@ from constant import all_letters, n_letters
 
 
 def train(input_line_tensor, target_line_tensor):
-    hidden = lstm.initHidden(batch_size)
-    cell = lstm.initCell(batch_size)
+    hidden = lstm.initHidden(batch_size).to(device)
+    cell = lstm.initCell(batch_size).to(device)
 
     lstm.zero_grad()
 
     loss = 0
 
     for i in range(input_line_tensor.size(1)):
-        input_ts = input_line_tensor[:, i, :, :]
+        input_ts = input_line_tensor[:, i, :, :].to(device)
         output, hidden, cell = lstm.forward(input_ts, hidden, cell)
         l = criterion(output, target_line_tensor[:, i])
         loss += l
@@ -47,6 +47,10 @@ if __name__ == '__main__':
     parser.add_argument('--num_iterations', type=str, default=10000)
     parser.add_argument('--print_every', type=str, default=1000)
     parser.add_argument('--batch_size', type=str, default=10)
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+    else:
+        device = torch.device('cpu')
     args = parser.parse_args()
     file = args.file
     output_dir = args.output_dir
@@ -63,7 +67,7 @@ if __name__ == '__main__':
 
     batch_size = int(args.batch_size)
 
-    lstm = LSTM(n_letters, 512, 512, n_letters)
+    lstm = LSTM(n_letters, 512, 512, n_letters, device).to(device)
 
     n_iters = int(args.num_iterations)
     print_every = int(args.print_every)

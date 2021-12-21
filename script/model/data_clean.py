@@ -50,6 +50,9 @@ def random_training_batch(data, N):
     input_ts = torch.stack(input_ts)
     target_ts = torch.stack(target_ts)
     target_ts = target_ts.type(torch.LongTensor)
+    if torch.cuda.is_available():
+        input_ts.to('cuda')
+        target_ts.to('cuda')
     return input_ts, target_ts
 
 
