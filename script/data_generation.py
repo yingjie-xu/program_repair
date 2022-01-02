@@ -22,5 +22,15 @@ def generate_hw2():
     write_result(hw2_data, '../data/result/hw2.json')
 
 
+def generate_hw3():
+    path = find_file_path('../data/sync/')
+    hw2_path = list(filter(lambda x: 'hw3' in x, path))
+    # hw2_path = hw2_path[:100]
+    hw2_data = []
+    for p in hw2_path:
+        hw2_data.extend(data_cleaning(p))
+    write_result(hw2_data, '../data/result/hw3.json')
+
+
 if __name__ == "__main__":
-    generate_hw2()
+    generate_hw3()
