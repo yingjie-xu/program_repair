@@ -23,13 +23,13 @@ class LSTM(nn.Module):
                 0).to(self.device), cell.squeeze(0).to(self.device)
         output_combined = torch.cat(
             (output, hidden_squeezed, cell_squeezed), 1).to(self.device)
-        output = self.o2o(output_combined)
-        output = self.dropout(output)
-        output = self.softmax(output)
+        output = self.o2o(output_combined).to(self.device)
+        output = self.dropout(output).to(self.device)
+        output = self.softmax(output).to(self.device)
         return output, hidden, cell
 
     def initHidden(self, batch_size):
-        return torch.zeros(1, batch_size, self.hidden_size)
+        return torch.zeros(1, batch_size, self.hidden_size).to(self.device)
 
     def initCell(self, batch_size):
-        return torch.zeros(1, batch_size, self.cell_size)
+        return torch.zeros(1, batch_size, self.cell_size).to(self.device)

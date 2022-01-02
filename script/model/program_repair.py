@@ -21,9 +21,12 @@ def train(input_line_tensor, target_line_tensor):
     for i in range(input_line_tensor.size(1)):
         input_ts = input_line_tensor[:, i, :, :].to(device)
         output, hidden, cell = lstm.forward(input_ts, hidden, cell)
-        l = criterion(output, target_line_tensor[:, i])
+        l = criterion(output.to(device), target_line_tensor[:, i].to(device))
         loss += l
-        # [[onehot, 0, 0, 1], [1, 0, 0, 0]] -> [[0, 0, 0, 1], [1, 0, 0]] -> [4, 3]
+
+        # "let", "le"
+        #[one hot l, ..]
+        # [[onehot, 0, 0, 1], [1, 0, 0, [0,0,0,0]]] -> [[0, 0, 0, 1], [1, 0, 0]] -> [4, 3]
     loss.backward()
 
     for p in lstm.parameters():
@@ -61,13 +64,12 @@ if __name__ == '__main__':
     with open(file, 'r') as fd:
         data = json.load(fd)
 
-    criterion = nn.NLLLoss()
-
     learning_rate = 0.0005
 
     batch_size = int(args.batch_size)
 
     lstm = LSTM(n_letters, 512, 512, n_letters, device).to(device)
+    criterion = nn.NLLLoss().to(device)
 
     n_iters = int(args.num_iterations)
     print_every = int(args.print_every)
@@ -86,5 +88,10 @@ if __name__ == '__main__':
         if iter % print_every == 0:
             print('%s (%d %d%%) %.4f' %
                   (timeSince(start), iter, iter / n_iters * 100, interval_loss / print_every))
+            name = file_name.split('.')[0]
+            out_file = os.path.join(output_dir, f'result_{name}')
+            with open(out_file, 'a+') as f:
+                f.write('%s (%d %d%%) %.4f\n' %
+                        (timeSince(start), iter, iter / n_iters * 100, interval_loss / print_every))
             interval_loss = 0
             torch.save(lstm, os.path.join(output_dir, f'model_at_{iter}.pt'))
